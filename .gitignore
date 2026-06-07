@@ -1,0 +1,8 @@
+# зависимости / сборка
+node_modules/
+
+# OS / редакторы / временные
+Thumbs.db
+.DS_Store
+*.tmp
+~$*
