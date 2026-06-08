@@ -32,9 +32,11 @@ for ln in lines:
 flush()
 
 def theme_of(cat):
+    # категория - путь вида .../Тема 12 или .../Тест 13/Тест 14 (вложенная).
+    # Берем ПОСЛЕДНИЙ номер в пути: для «Тест 13/Тест 14» это тема 14, а не 13.
     if not cat: return None
-    m=re.search(r"(?:Тема|Тест)\s*(\d+)", cat)
-    return m.group(1) if m else None
+    ms=re.findall(r"(?:Тема|Тест)\s*(\d+)", cat)
+    return ms[-1] if ms else None
 
 def clean(s):
     s=re.sub(r"^\s*\[(?:html|markdown|moodle|plain)\]","",s)
@@ -62,6 +64,8 @@ def is_year_fact(opts):
     return True
 
 themes={}
+seen_q=set()   # глобальный дедуп: один и тот же текст вопроса не должен попасть в разные темы
+               # (в исходном банке категория «Тест 13» продублирована вопросами «Платформа ЦД»)
 for cat,seg in segments:
     th=theme_of(cat)
     if th is None: continue
@@ -79,6 +83,8 @@ for cat,seg in segments:
             if atext: opts.append({"t":atext,"c":am.group(1)=="="})
         if len(opts)<2 or not any(o["c"] for o in opts): continue
         if is_year_fact(opts): continue   # выкидываем «назови год»
+        if qtext in seen_q: continue       # глобальный дедуп (см. seen_q выше)
+        seen_q.add(qtext)
         themes.setdefault(th,[]).append({"q":qtext,"options":opts})
 
 out={"themes":{}}
