@@ -784,6 +784,55 @@ var FINAL = {
   ]
 };
 
+/* ---------- Модуль 16 (essay): «Дорожная карта к двойнику» ----------
+   Слой 1 - разложить 8 этапов пути «CAD-модель -> полномасштабный цифровой двойник» в верном
+   порядке (последовательность по FINAL / ГОСТ Р 57700.37 / курсу ПИШ СПбПУ). Слой 2 - связное
+   эссе (6-10 предложений) на примере своего изделия: ЧТО предстоит сделать на каждом этапе,
+   правильными терминами курса. Авто-проверка терминов дает мгновенный балл «формулировка, %»;
+   сам текст эссе уходит в отчет преподавателю (p.log -> buildReport) для финальной оценки.
+   Старый вариант (buckets «перспективы/хайп») сохранен в CFG["16"] - откат: STATIONS[16].mech="buckets". */
+var ROADMAP = {
+  // верный порядок этапов (индекс массива = правильная позиция)
+  stages:[
+    "Концепция и матрица требований и целевых показателей изделия",
+    "CAD-модель: трехмерная геометрия изделия",
+    "Система математических и компьютерных моделей физических процессов",
+    "Верификация и валидация моделей - оценка адекватности",
+    "Виртуальные испытания на цифровых стендах и полигонах",
+    "Программно-технологическая платформа ЦД (ядро управления расчетами и данными класса SPDM)",
+    "Двусторонние связи изделие - двойник в эксплуатации",
+    "Цифровой двойник изделия по стадиям жизненного цикла (полномасштабный)"
+  ],
+  // что должно прозвучать в эссе (правильные термины курса). ВАЖНО: \w в JS не ловит кириллицу,
+  // поэтому корни слов заданы явным классом [а-яё] (с флагом i).
+  need:[
+    {key:"req",   label:"Матрица требований и целевых показателей", re:/(матриц[а-яё]*\s+требован|целев[а-яё]*\s+показател|требован[а-яё]*\s+и\s+(ресурсн[а-яё]*\s+)?ограничен)/i},
+    {key:"models",label:"Система моделей / цифровая модель изделия", re:/(математическ[а-яё]*\s+и\s+компьютерн|систем[а-яё]*\s+модел|цифров[а-яё]*\s+модел[а-яё]*\s+издел|модел[а-яё]*\s+физ[а-яё]*|кэ[\s-]|cae|конечно[\s-]?элемент)/i},
+    {key:"verif", label:"Верификация (корректность вычислений)", re:/верификац[а-яё]*/i},
+    {key:"valid", label:"Валидация (по натурным данным)", re:/валидац[а-яё]*/i},
+    {key:"adeq",  label:"Адекватность модели", re:/адекватн[а-яё]*/i},
+    {key:"vtest", label:"Виртуальные испытания (стенды и полигоны)", re:/(виртуальн[а-яё]*\s+испыт|цифров[а-яё]*\s+(стенд|полигон)|виртуальн[а-яё]*\s+(стенд|полигон))/i},
+    {key:"bilink",label:"Двусторонние связи с изделием", re:/(двусторонн[а-яё]*\s+связ|обратн[а-яё]*\s+связ)/i},
+    {key:"life",  label:"Жизненный цикл / полномасштабный двойник", re:/(жизненн[а-яё]*\s+цикл|полномасштабн[а-яё]*|стади[а-яё]*\s+жизн)/i}
+  ],
+  // типичные ошибки употребления (ловушки) - подсвечиваются предупреждением
+  traps:[
+    {key:"market", label:"«Двойник» вне рубрики изделия (сотрудник/город/процесс) - это маркетинг", re:/двойник[а-яё]*\s+(сотрудник[а-яё]*|работник[а-яё]*|человек[а-яё]*|город[а-яё]*|процесс[а-яё]*|завод[а-яё]*|цех[а-яё]*|здани[а-яё]*|аэропорт[а-яё]*|земл[а-яё]*)/i},
+    {key:"viz",    label:"3D-модель или визуализация выдана за двойник", re:/(двойник[а-яё]*\s*[-—:]\s*это\s+(прост[а-яё]*\s+)?(3d|трехмерн[а-яё]*|красив[а-яё]*|визуализац[а-яё]*)|достаточн[а-яё]*\s+(3d|трехмерн[а-яё]*\s+модел|визуализац[а-яё]*))/i},
+    {key:"sensors",label:"«Обвешать датчиками» названо двойником", re:/(обвеш[а-яё]*\s+[а-яё]*\s*датчик|достаточн[а-яё]*\s+датчик|двойник[а-яё]*\s*[-—:]\s*это\s+датчик)/i}
+  ],
+  // упоминание своего изделия (привязка к объекту)
+  obj:{
+    gtd:/(двигател[а-яё]*|гтд|турбин[а-яё]*|лопат[а-яё]*|компрессор[а-яё]*)/i,
+    car:/(автомобил[а-яё]*|кузов[а-яё]*|aurus|аурус|подвеск[а-яё]*|лонжерон[а-яё]*)/i,
+    tvs:/(твс|тепловыдел[а-яё]*|твэл[а-яё]*|оболочк[а-яё]*|теплонос[а-яё]*|сборк[а-яё]*)/i,
+    turbine:/(турбин[а-яё]*|ротор[а-яё]*|энергоблок[а-яё]*|лопат[а-яё]*|диск[а-яё]*)/i,
+    oilgas:/(трубопровод[а-яё]*|труб[а-яё]*|арматур[а-яё]*|давлен[а-яё]*|перекачк[а-яё]*)/i,
+    uav:/(бпла|беспилотн[а-яё]*|планер[а-яё]*|крыл[а-яё]*|лонжерон[а-яё]*)/i
+  },
+  minWords:50
+};
+
 /* кольцо-цикл финала (SVG): узлы по статусу + дуга готовности */
 function finalRing(idx, results){
   var n=FINAL.stages.length, R=104, cx=130, cy=130;
@@ -804,69 +853,133 @@ function finalRing(idx, results){
     nodes+"</svg>";
 }
 
+/* ФИНАЛ «Запуск двойника» = эссе «Дорожная карта к двойнику».
+   Слой 1 - разложить 8 этапов пути CAD-модель -> полномасштабный ЦД в верном порядке.
+   Слой 2 - связное эссе на примере своего изделия с живым термин-метром.
+   Готовность к запуску = (последовательность + формулировка)/2; запуск при >= 60%.
+   Текст эссе уходит в отчет преподавателю (logEvent -> buildReport). */
 function runFinal(){
-  var ses={ idx:0, correct:0, results:[], locked:false };
-  drawFinalStage(ses);
-}
-function drawFinalStage(ses){
-  var n=FINAL.stages.length;
-  if(ses.idx>=n) return finalResult(ses);
-  var stage=FINAL.stages[ses.idx];
-  var twinOp=(0.25+0.75*ses.correct/n).toFixed(2);
-  var opts=shuffle(stage.opts.slice());
-  app.innerHTML=head()+
-   "<div class='card pad'>"+
-   "<div class='station-head'><button class='btn ghost sm' id='exit'>← На стенд</button><span class='tag'>Финал</span><h2 style='margin:0'>Запуск двойника</h2></div>"+
-   "<div class='finalwrap'>"+
-     "<div class='fringbox'>"+finalRing(ses.idx, ses.results)+
-       "<img class='ftwin' src='assets/hero/core_cube_twin.png' style='opacity:"+twinOp+"' onerror=\"this.style.display='none'\">"+
-       "<div class='fready'>Готовность<br><b>"+ses.correct+" / "+n+"</b></div></div>"+
-     "<div class='fstage'>"+
-       "<div class='muted' style='font-family:var(--mono);font-size:12px'>Этап "+(ses.idx+1)+" из "+n+" · цикл создания ЦД · «"+esc(izdName())+"»</div>"+
-       "<h3 style='margin:4px 0 6px'>"+esc(stage.t)+"</h3>"+
-       "<div class='q' style='margin-bottom:10px'>"+esc(stage.q)+"</div>"+
-       "<div class='answers'>"+opts.map(function(o){ return "<button class='ans' data-c='"+(o.c?1:0)+"'>"+esc(o.t)+"</button>"; }).join("")+"</div>"+
-       "<div class='fb' id='ffb' style='display:none'></div>"+
-       "<div style='margin-top:12px'><button class='btn' id='fnext' style='display:none'>Дальше</button></div>"+
-     "</div>"+
-   "</div></div>";
-  Array.prototype.forEach.call(document.querySelectorAll(".ans"),function(b){
-    b.onclick=function(){
-      if(ses.locked) return; ses.locked=true;
-      var ok=b.getAttribute("data-c")==="1";
-      Array.prototype.forEach.call(document.querySelectorAll(".ans"),function(x){ x.style.pointerEvents="none";
-        if(x.getAttribute("data-c")==="1") x.classList.add("ok"); });
-      if(!ok) b.classList.add("bad");
-      ses.results[ses.idx]= ok; if(ok) ses.correct++;
-      var fb=document.getElementById("ffb"); fb.style.display="block";
-      fb.className="fb"+(ok?" ok":""); fb.innerHTML=(ok?"Верно. ":"")+esc(FINAL.stages[ses.idx].why);
-      var nx=document.getElementById("fnext"); nx.style.display="inline-flex";
-      nx.textContent = (ses.idx===n-1) ? "Запустить двойник" : "Дальше";
-      nx.onclick=function(){ ses.idx++; ses.locked=false; drawFinalStage(ses); };
+  var izdId=player().izdelie;
+  var izd=(GAUGE[izdId]&&GAUGE[izdId].name)||"изделия";
+  var seq=ROADMAP.stages;
+  var chips=shuffle(seq.map(function(t,i){ return {t:t, i:i}; }));
+  var placed=[], orderScore=0, essayText="";
+
+  function shell(inner){
+    return head()+
+      "<div class='card pad'>"+
+      "<div class='station-head'><button class='btn ghost sm' id='exit'>← На стенд</button><span class='tag'>Финал</span><h2 style='margin:0'>Запуск двойника</h2></div>"+
+      inner+"</div>";
+  }
+  function bindExit(){ var e=document.getElementById("exit"); if(e) e.onclick=render; bindLogout(); }
+
+  function drawOrder(){
+    var chipHTML=chips.map(function(c){
+      var used=placed.indexOf(c.i)>=0;
+      return "<button class='chip"+(used?" used":"")+"' data-i='"+c.i+"'>"+esc(c.t)+"</button>";
+    }).join("");
+    var slotHTML=seq.map(function(_,n){
+      var filled=n<placed.length ? esc(seq[placed[n]]) : "<span class='muted'>...</span>";
+      return "<div class='s'><b>"+(n+1)+"</b><span class='val'>"+filled+"</span></div>";
+    }).join("");
+    app.innerHTML=shell(
+      "<p class='muted'>Финал. Собери дорожную карту пути к <b>полномасштабному цифровому двойнику</b> изделия («"+esc(izd)+"»): разложи 8 этапов в правильном порядке. Кликай по очереди - от первого к последнему. Помни: старт - не геометрия, а матрица требований и целевых показателей.</p>"+
+      "<div class='chips'>"+chipHTML+"</div>"+
+      "<div class='seq levels roadmap'>"+slotHTML+"</div>"+
+      "<div style='margin-top:16px' class='row-between'><button class='btn ghost sm' id='rst'>Сброс</button>"+
+      "<button class='btn' id='chk'"+(placed.length===seq.length?"":" disabled")+">Дальше: эссе</button></div>");
+    Array.prototype.forEach.call(document.querySelectorAll(".chip"),function(b){
+      b.onclick=function(){ var i=parseInt(b.getAttribute("data-i"),10); if(placed.indexOf(i)<0 && placed.length<seq.length){ placed.push(i); drawOrder(); } };
+    });
+    document.getElementById("rst").onclick=function(){ placed=[]; drawOrder(); };
+    var chk=document.getElementById("chk");
+    if(chk) chk.onclick=function(){
+      var ok=0; placed.forEach(function(idx,n){ if(idx===n) ok++; });
+      orderScore=Math.round(ok/seq.length*100);
+      reviewOrder();
     };
-  });
-  bindLogout();
+    bindExit();
+  }
+
+  function reviewOrder(){
+    var correct=0; placed.forEach(function(idx,n){ if(idx===n) correct++; });
+    var rows=seq.map(function(s,n){
+      var ok=(placed[n]===n);
+      var verdict=ok ? "<span class='opt ok'>"+esc(s)+" ✓</span>"
+        : "<span class='opt bad'>ты поставил: "+esc(placed[n]!=null?seq[placed[n]]:"-")+"</span><span class='opt ok'>верно: "+esc(s)+"</span>";
+      return "<div class='term'><div class='lbl'>"+(n+1)+" этап</div>"+verdict+"</div>";
+    }).join("");
+    app.innerHTML=shell(
+      "<p class='muted'>Разбор последовательности: зеленым - верный этап, красным - где порядок перепутан.</p>"+
+      "<div class='terms'>"+rows+"</div>"+
+      "<div class='fb"+(correct===seq.length?" ok":"")+"'>Верный порядок: "+correct+" из "+seq.length+". Дальше опиши этот путь своими словами.</div>"+
+      "<div style='margin-top:14px'><button class='btn' id='cont'>Перейти к эссе</button></div>");
+    document.getElementById("cont").onclick=drawEssay;
+    bindExit();
+  }
+
+  function drawEssay(){
+    var hint=seq.map(function(s,n){ return (n+1)+". "+esc(s); }).join("<br>");
+    app.innerHTML=shell(
+      "<p class='muted'>Теперь напиши связное эссе (6-10 предложений): как инженер пройдет путь от матрицы требований и целевых показателей через CAD-модель и систему расчетных моделей до полномасштабного цифрового двойника изделия («"+esc(izd)+"»). Опиши, ЧТО предстоит сделать на каждом этапе, правильными терминами курса. Термин-метр справа подсветит, что уже прозвучало.</p>"+
+      "<div class='essaywrap'>"+
+        "<div class='essaycol'>"+
+          "<textarea id='essay' class='essaybox' rows='12' placeholder='Например: Сначала формируем матрицу требований и целевых показателей для изделия. Затем строим систему математических и компьютерных моделей физических процессов. Проводим верификацию и валидацию, чтобы оценить адекватность моделей. Запускаем виртуальные испытания на цифровых стендах и полигонах. На платформе ЦД настраиваем двусторонние связи с изделием и сопровождаем его по стадиям жизненного цикла...'></textarea>"+
+          "<div class='essaymeta'><span id='wc' class='muted'>0 слов</span> <button class='btn ghost sm' id='hintbtn' type='button'>Опорный план этапов</button></div>"+
+          "<div id='hintbox' class='hintbox' style='display:none'>"+hint+"</div>"+
+        "</div>"+
+        "<div class='metercol'><div class='metertitle'>Термин-метр</div><ul class='meter' id='meter'></ul><div class='meterscore' id='mscore'></div></div>"+
+      "</div>"+
+      "<div style='margin-top:16px' class='row-between'><button class='btn ghost sm' id='back'>Назад к порядку</button>"+
+      "<button class='btn' id='done' disabled>Запустить двойник</button></div>");
+    var ta=document.getElementById("essay");
+    if(essayText) ta.value=essayText;
+    function refresh(){
+      essayText=ta.value;
+      var r=essayCheck(essayText, izdId);
+      var items=r.need.map(function(g){ return "<li class='"+(g.ok?"on":"")+"'>"+(g.ok?"✓":"○")+" "+esc(g.label)+"</li>"; }).join("");
+      items+="<li class='"+(r.objOk?"on":"")+"'>"+(r.objOk?"✓":"○")+" Упомянуто изделие («"+esc(izd)+"»)</li>";
+      r.traps.forEach(function(tp){ items+="<li class='warn'>⚠ "+esc(tp.label)+"</li>"; });
+      document.getElementById("meter").innerHTML=items;
+      document.getElementById("wc").textContent=r.words+" слов";
+      document.getElementById("mscore").innerHTML="Оценка формулировки: <b>"+r.score+"%</b>"+(r.words<ROADMAP.minWords?" <span class='muted'>(коротко - добавь деталей)</span>":"");
+      document.getElementById("done").disabled = !(r.words>=ROADMAP.minWords && r.covered>=4);
+    }
+    ta.oninput=refresh;
+    document.getElementById("hintbtn").onclick=function(){ var h=document.getElementById("hintbox"); h.style.display=(h.style.display==="none"?"block":"none"); };
+    document.getElementById("back").onclick=drawOrder;
+    document.getElementById("done").onclick=function(){ var r=essayCheck(essayText, izdId); finalResult(orderScore, r, essayText); };
+    refresh();
+    bindExit();
+  }
+
+  drawOrder();
 }
-function finalResult(ses){
-  var n=FINAL.stages.length, pct=Math.round(ses.correct/n*100), launched=ses.correct>=FINAL.pass;
+function finalResult(orderScore, r, essayText){
+  var pct=Math.round((orderScore + r.score)/2);
+  var launched=pct>=60;
   var p=player(); p.progress=p.progress||{};
   var prev=p.progress["final"];
-  if(launched && (!prev || pct>prev.total)) p.progress["final"]={total:pct, points:pct, stars: pct>=95?3:pct>=80?2:1};
+  if(launched && (!prev || pct>prev.total)) p.progress["final"]={total:pct, points:pct, stars: pct>=90?3:pct>=75?2:1};
   persist();
-  logEvent(p, {station:"final", title:"Запуск двойника", readiness:pct, launched:launched, correct:ses.correct, of:n,
-    wrong:FINAL.stages.filter(function(s,i){ return ses.results[i]===false; }).map(function(s){ return s.t; })});
+  logEvent(p, {station:"final", title:"Запуск двойника", readiness:pct, launched:launched,
+    order:orderScore, formulation:r.score, words:r.words,
+    essay:{ text:essayText, score:r.score, order:orderScore, words:r.words,
+      covered:r.need.filter(function(g){ return g.ok; }).map(function(g){ return g.key; }),
+      missing:r.need.filter(function(g){ return !g.ok; }).map(function(g){ return g.key; }),
+      traps:r.traps.map(function(t){ return t.key; }), objOk:r.objOk }});
   sendReport("final");
   var eb=earnedBadges(p);
   var badgesRow = eb.length ? "<div style='margin-top:6px'><div class='muted' style='font-size:12px;margin-bottom:6px'>Заработанные награды:</div><div class='fbadges'>"+
     eb.map(function(b){ return "<div class='badge on' title='"+esc(b.desc)+"'><span class='bi'>"+b.ic+"</span><span class='bn'>"+esc(b.name)+"</span></div>"; }).join("")+"</div></div>" : "";
-  var weak=FINAL.stages.filter(function(s,i){ return ses.results[i]===false; }).map(function(s){ return s.t; });
+  var miss=r.need.filter(function(g){ return !g.ok; }).map(function(g){ return g.label; });
   app.innerHTML=head()+
    "<div class='card pad result'>"+
    "<div class='launchbox"+(launched?" go":"")+"'><img class='ftwin big' src='assets/hero/core_cube_twin.png' onerror=\"this.style.display='none'\"><div class='flame'></div></div>"+
    "<h2>"+(launched?"Цифровой двойник запущен!":"Двойник пока не готов к запуску")+"</h2>"+
-   "<p class='muted'>Готовность к запуску: <b>"+pct+"%</b> ("+ses.correct+" из "+n+" этапов цикла)."+
-     (launched?" Уровень зрелости: <b>Цифровой двойник готов</b>.":" Нужно не меньше "+FINAL.pass+" из "+n+".")+"</p>"+
-   (weak.length? "<div class='fb'>Стоит повторить этапы: "+esc(weak.join("; "))+".</div>":"")+
+   "<p class='muted'>Готовность к запуску: <b>"+pct+"%</b> (последовательность "+orderScore+"%, формулировка "+r.score+"%)."+
+     (launched?" Уровень зрелости: <b>Цифровой двойник готов</b>.":" Нужно не меньше 60%.")+"</p>"+
+   (miss.length? "<div class='fb'>В эссе не прозвучало: "+esc(miss.join("; "))+".</div>":"")+
    badgesRow+
    "<div class='row-between' style='max-width:440px;margin:18px auto 0'>"+
      "<button class='btn ghost' id='fretry'>Пройти финал заново</button>"+
@@ -1153,10 +1266,10 @@ function renderHub(){
     return "<div class='asm"+(dn?" on":"")+"'><span class='ai'>"+(dn?s.icon:"·")+"</span><span class='an'>"+esc(s.node)+"</span></div>";
   }).join("");
   var finalDone=!!prog["final"], finalReady=done===STATIONS.length;
-  var finalHTML="<div class='finalcard"+(finalReady?" ready":"")+(finalDone?" done":"")+"' id='finalbtn'>"+
-    "<div class='fci'>"+(finalDone?"🏁":finalReady?"🚀":"🔒")+"</div>"+
+  var finalHTML="<div class='finalcard ready"+(finalDone?" done":"")+"' id='finalbtn'>"+
+    "<div class='fci'>"+(finalDone?"🏁":"🚀")+"</div>"+
     "<div class='meta'><div class='t'>Финал · Запуск двойника</div>"+
-    "<div class='n'>"+(finalDone?("Двойник запущен · "+prog["final"].total+"%"):finalReady?"Все 16 модулей пройдены - можно запускать!":("Откроется после всех модулей (осталось "+(STATIONS.length-done)+")"))+"</div></div>"+
+    "<div class='n'>"+(finalDone?("Двойник запущен · "+prog["final"].total+"%"):finalReady?"Все 16 модулей пройдены - можно запускать!":("Доступно в любой момент (пройдено "+done+" из "+STATIONS.length+")"))+"</div></div>"+
     (finalDone?"<div class='stars'>"+starStr(prog["final"].stars)+"</div>":"")+"</div>";
   var earned=earnedBadges(p), eset={}; earned.forEach(function(b){ eset[b.id]=1; });
   var badgeHTML=BADGES.map(function(b){ var on=!!eset[b.id];
@@ -1205,7 +1318,7 @@ function renderHub(){
       startStation(id); };
   });
   var fbn=document.getElementById("finalbtn");
-  if(fbn) fbn.onclick=function(){ if(finalReady) runFinal(); };
+  if(fbn) fbn.onclick=function(){ runFinal(); };
   Array.prototype.forEach.call(document.querySelectorAll(".badge.on[data-bid]"),function(node){
     var open=function(){ var b=badgeById(node.getAttribute("data-bid")); if(b) openBadgeCard(b); };
     node.onclick=open;
@@ -1743,6 +1856,25 @@ function mechLinks(ses){
     bindLogout();
   }
   draw();
+}
+
+/* ---------- проверка эссе финала «Дорожная карта к двойнику» ----------
+   Используется в runFinal: считает покрытие обязательных терминов (ROADMAP.need),
+   ловушки (ROADMAP.traps), упоминание изделия (ROADMAP.obj) и итоговый балл формулировки. */
+function essayCheck(text, izd){
+  var t=String(text||"");
+  var words=(t.trim().match(/[0-9a-zA-Zа-яёА-ЯЁ]+/g)||[]).length;
+  var need=ROADMAP.need.map(function(g){ return {key:g.key, label:g.label, ok:g.re.test(t)}; });
+  var covered=need.filter(function(g){ return g.ok; }).length;
+  var traps=ROADMAP.traps.filter(function(g){ return g.re.test(t); });
+  var objRe=ROADMAP.obj[izd]||ROADMAP.obj.gtd;
+  var objOk=objRe.test(t);
+  var shortFactor=Math.min(1, words/ROADMAP.minWords);
+  var score=(covered/ROADMAP.need.length)*100*shortFactor;
+  if(!objOk) score-=15;
+  score-=traps.length*8;
+  score=Math.max(0, Math.min(100, Math.round(score)));
+  return { words:words, need:need, covered:covered, traps:traps, objOk:objOk, score:score };
 }
 
 /* ---------- общий экран-разбор для механик (что верно, где ошибка) ---------- */
